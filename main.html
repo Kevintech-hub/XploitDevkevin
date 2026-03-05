@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=0.8, user-scalable=no" />
+<title>JEXPLOIT AND VESPER-XMD</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://kit.fontawesome.com/a2e0da6e4c.js" crossorigin="anonymous"></script>
+
+<style>
+:root {
+  --gold: #d4af37;
+  --dark-gold: #b8860b;
+  --red: #8b0000;
+  --deep-red: #5c0000;
+  --black: #0f0f0f;
+  --glass: rgba(255,255,255,0.05);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  background: linear-gradient(135deg, #000000, #5c0000, #d4af37);
+  background-size: 400% 400%;
+  animation: gradientMove 12s ease infinite;
+  color: var(--gold);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.main-content {
+  width: 95%;
+  max-width: 700px;
+  background: rgba(0,0,0,0.75);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 0 40px rgba(212,175,55,0.4);
+  text-align: center;
+}
+
+.logo img {
+  width: 90px;
+  border-radius: 50%;
+  margin-bottom: 20px;
+  box-shadow: 0 0 20px var(--gold);
+}
+
+h1 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 2.8rem;
+  margin-bottom: 25px;
+  color: var(--gold);
+  text-shadow: 0 0 20px rgba(212,175,55,0.8);
+}
+
+.status-bar {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 30px;
+  font-weight: 500;
+  color: #ffffff;
+  border-top: 1px solid var(--gold);
+  border-bottom: 1px solid var(--gold);
+  padding: 10px 0;
+}
+
+.section {
+  margin-bottom: 35px;
+  padding: 25px;
+  border-radius: 15px;
+  border: 1px solid var(--gold);
+  background: var(--glass);
+}
+
+.section h3 {
+  font-size: 1.6rem;
+  margin-bottom: 20px;
+  color: var(--gold);
+}
+
+.btn-grid {
+  display: flex;
+  justify-content: center;
+}
+
+.btn {
+  background: linear-gradient(45deg, var(--red), var(--gold));
+  border: none;
+  padding: 14px 30px;
+  border-radius: 12px;
+  color: white;
+  font-weight: bold;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: 0.3s;
+  box-shadow: 0 0 20px rgba(212,175,55,0.5);
+}
+
+.btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 30px rgba(212,175,55,0.8);
+}
+
+.footer {
+  margin-top: 40px;
+  font-size: 0.95rem;
+  color: #ccc;
+}
+
+.dev-section .btn {
+  margin: 8px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="main-content">
+
+<div class="logo">
+<img src="https://files.catbox.moe/atfp7w.jpg">
+</div>
+
+<h1>JEXPLOIT AND VESPER-XMD PORTAL</h1>
+
+<div class="status-bar">
+  <div id="time"></div>
+  <div id="date"></div>
+  <div id="battery-status">
+    <i class="fas fa-battery-full"></i>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Get Session ID</h3>
+  <div class="btn-grid">
+    <!-- QR BUTTON REMOVED -->
+    <button class="btn" onclick="window.open('/pair')">Pair Code</button>
+  </div>
+</div>
+
+<div class="section dev-section">
+  <h3>Developer & Community</h3>
+  <div class="btn-grid">
+    <button class="btn" onclick="window.open('https://github.com/Kevintech-hub/Vesper-Xmd')">GitHub</button>
+    <button class="btn" onclick="window.open('https://whatsapp.com/channel/0029Vb6eR1r05MUgYul6Pc2W')">WhatsApp Channel</button>
+  </div>
+</div>
+
+<div class="footer">
+Made with passion & style by Kevin <br>
+By Order of the Peaky Blinders 🎩
+</div>
+
+</div>
+
+<script>
+function updateTime() {
+  const time = new Date();
+  document.getElementById('time').textContent = time.toLocaleTimeString();
+  document.getElementById('date').textContent = time.toLocaleDateString();
+}
+
+function updateBatteryStatus() {
+  if (navigator.getBattery) {
+    navigator.getBattery().then(function(battery) {
+      let level = Math.round(battery.level * 100) + '%';
+      let charging = battery.charging ? 'Charging' : 'Discharging';
+      document.getElementById('battery-status').textContent = level + ' | ' + charging;
+    });
+  }
+}
+
+setInterval(updateTime, 1000);
+updateTime();
+updateBatteryStatus();
+</script>
+
+</body>
+</html>
