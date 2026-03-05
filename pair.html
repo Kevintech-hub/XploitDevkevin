@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>JEXPLOIT AND VESPER-XMD PAIR CODE | WHATSAPP CONNECT</title>
+  <meta name="theme-color" content="#1a0a0a" />
+  <link rel="icon" href="https://files.catbox.moe/b2oixn.jpg">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" />
+
+  <style>
+    :root {
+      --gold:#d4af37;
+      --gold-light:#f5d77a;
+      --red:#8b0000;
+      --red-light:#c1121f;
+      --dark:#120404;
+      --darker:#1a0a0a;
+      --text:#fff5f5;
+      --gray:#e0cfcf;
+      --card-bg:rgba(212,175,55,0.06);
+      --shadow:0 15px 40px rgba(0,0,0,0.7);
+      --transition:all 0.3s ease;
+    }
+
+    * {box-sizing:border-box;margin:0;padding:0;transition:var(--transition);}
+
+    body {
+      font-family:'Poppins',sans-serif;
+      color:var(--text);
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      background:linear-gradient(135deg,#1a0a0a 0%,#2b0f0f 40%,#4a1010 70%,#120404 100%);
+      background-attachment: fixed;
+      padding:20px;
+    }
+
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 14px 20px;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(6px);
+      border-bottom: 1px solid rgba(212,175,55,0.3);
+      z-index: 1000;
+      text-align: center;
+    }
+
+    .navbar .brand {
+      background: linear-gradient(90deg,var(--gold),var(--red-light));
+      -webkit-background-clip: text;
+      color: transparent;
+      font-weight: 800;
+      font-size: 1.2rem;
+      text-decoration: none;
+      letter-spacing: 0.5px;
+    }
+
+    .pair-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(212,175,55,0.3);
+      border-radius: 18px;
+      padding: 40px 30px;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: var(--shadow);
+      text-align: center;
+      backdrop-filter: blur(10px);
+    }
+
+    .pair-card h1 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      background: linear-gradient(90deg,var(--gold-light),var(--red-light));
+      -webkit-background-clip: text;
+      color: transparent;
+      margin-bottom: 6px;
+    }
+
+    .pair-card p {
+      color: var(--gray);
+      font-size: 0.95rem;
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      text-align: left;
+      margin-bottom: 6px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(212,175,55,0.4);
+      background: rgba(139,0,0,0.15);
+      color: var(--text);
+      font-size: 0.95rem;
+      margin-bottom: 16px;
+    }
+
+    .pair-btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 700;
+      color: #fff;
+      background: linear-gradient(135deg,var(--red),var(--gold));
+      cursor: pointer;
+      margin-bottom: 15px;
+    }
+
+    .channel-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(212,175,55,0.15);
+      color: var(--gold-light);
+      border-radius: 25px;
+      padding: 8px 16px;
+      text-decoration: none;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <nav class="navbar">
+    <a href="https://github.com/Kevintech-hub/Vesper-Xmd" class="brand">
+      <i class="fas fa-robot"></i> JEXPLOIT-BOT
+    </a>
+  </nav>
+
+  <div class="pair-card">
+    <h1>JEXPLOIT- PAIRING CODE</h1>
+    <p>Enter your WhatsApp number without the + sign</p>
+
+    <label for="number">Phone Number</label>
+    <input type="text" id="number" placeholder="e.g., 256xxxxxxxxxx" />
+    <button id="submit" class="pair-btn">GET CODE</button>
+
+    <a href="https://whatsapp.com/channel/0029Vb6eR1r05MUgYul6Pc2W" target="_blank" class="channel-btn">
+      <i class="fab fa-whatsapp"></i> Channel
+    </a>
+
+    <div id="pair" style="margin-top:20px;"></div>
+  </div>
+
+  <!-- ✅ Updated axios (stable version) -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+  <script>
+    let a = document.getElementById("pair");
+    let b = document.getElementById("submit");
+    let c = document.getElementById("number");
+
+    async function Copy() {
+      let text = document.getElementById("copy").innerText;
+      let obj = document.getElementById("copy");
+      await navigator.clipboard.writeText(obj.innerText.replace('CODE: ', ''));
+      obj.innerText = "COPIED";
+      obj.style = "color:gold;font-weight:bold";
+      setTimeout(() => {
+        obj.innerText = text;
+        obj.style = "color:red;font-weight:bold";
+      }, 500);
+    }
+
+    b.addEventListener("click", async (e) => {
+      e.preventDefault();
+
+      if (!c.value) {
+        a.innerHTML = '<a style="color:gold;font-weight:bold">Enter your WhatsApp number with a country code</a><br><br>';
+        return;
+      }
+
+      if (c.value.replace(/[^0-9]/g, "").length < 11) {
+        a.innerHTML = '<a style="color:gold;font-weight:bold">Invalid number format</a><br><br>';
+        return;
+      }
+
+      const bc = c.value.replace(/[^0-9]/g, "");
+      a.innerHTML = '<a style="color:gold;font-weight:bold">Please wait...</a><br><br>';
+
+      try {
+        let { data } = await axios.get(`/code?number=${bc}`);
+        let code = data.code || "Service Unavailable";
+
+        a.innerHTML =
+          '<font id="copy" onclick="Copy()" style="color:gold;font-weight:bold" size="5">CODE: <span style="color:white;font-weight:bold">' +
+          code +
+          '</span></font><br><br><br>';
+
+      } catch (err) {
+        a.innerHTML = '<a style="color:red;font-weight:bold">Error connecting to server</a><br><br>';
+      }
+    });
+  </script>
+
+</body>
+</html>
