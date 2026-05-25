@@ -1,0 +1,25 @@
+{
+  "name": "JEXPLOIT Session",
+  "description": "Vesper-Xmd WhatsApp Session Generator - Next-Gen Pairing Service",
+  "logo": "https://files.catbox.moe/lu3bqk.jpg",
+  "repository": "https://github.com/Kevintech-hub/Jexploit-Bot",
+  "keywords": ["whatsapp", "session", "pairing", "vesper-xmd"],
+  "success_url": "/",
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ],
+  "env": {
+    "PORT": {
+      "description": "Port for web app",
+      "value": "5000",
+      "required": false
+    },
+    "NODE_ENV": {
+      "description": "Node environment",
+      "value": "production",
+      "required": false
+    }
+  }
+}
