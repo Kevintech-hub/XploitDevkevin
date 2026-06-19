@@ -24,6 +24,6 @@
     "path": "^0.12.7",
     "megajs": "1.1.7",
     "baileys-elite" : "latest",
-    "jimp": "^0.16.13"
+    "jimp": "*"
    }
 }
