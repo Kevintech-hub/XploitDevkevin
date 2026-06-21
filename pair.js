@@ -176,7 +176,7 @@ router.get('/', async (req, res) => {
             }
         }
     }
-    return await PEAKY_BLINDER_MD_PAIR_CODE();
+    return await JEXPLOIT_PAIR_CODE();
 });
 
 module.exports = router;
