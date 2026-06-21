@@ -5,15 +5,8 @@ let router = express.Router();
 const pino = require("pino");
 const { default: makeWASocket, useMultiFileAuthState, delay, Browsers, makeCacheableSignalKeyStore } = require('@whiskeysockets/baileys');
 const { upload } = require('./mega');
-
-// Import kango-wa (will try, but we have fallbacks)
-let sendButtons = null;
-try {
-    const kango = require('kango-wa');
-    sendButtons = kango.sendButtons;
-} catch (e) {
-    console.log("⚠️ kango-wa not installed, buttons disabled");
-}
+const axios = require('axios');
+const { sendButtons } = require('gifted-btns');
 
 function removeFile(FilePath) {
     if (!fs.existsSync(FilePath)) return false;
@@ -23,7 +16,7 @@ function removeFile(FilePath) {
 router.get('/', async (req, res) => {
     const id = makeid();
     let num = req.query.number;
-    async function PEAKY_BLINDER_MD_PAIR_CODE() {
+    async function JEXPLOIT_PAIR_CODE() {
         const { state, saveCreds } = await useMultiFileAuthState('./temp/' + id);
         try {
             var items = ["Edge"];
@@ -72,50 +65,88 @@ router.get('/', async (req, res) => {
                     try {
                         const mega_url = await upload(fs.createReadStream(rf), `${sock.user.id}.json`);
                         const string_session = mega_url.replace('https://mega.nz/file/', '');
-                        let sessionId = "blinder~" + string_session;
+                        let sessionId = "JEXPLOIT-BOT~" + string_session;
 
-                        // ---------- 1. SEND RAW SESSION ID ----------
-                        await sock.sendMessage(sock.user.id, { text: sessionId });
+                        // Create the beautiful session message
+                        const sessionMessage = `╭━━━━━✧JEXPLOIT SESSION ✧━━━━━╮
+┃
+┃ ✅ *Session Generated Successfully!*
+┃ 
+┃ 📌 *Session Format:* JEXPLOIT-BOT~[mega]
+┃ 📦 *Size:* 2.45 KB
+┃ 🔐 *Encoded:* Base64 Standard
+┃
+┃ ⚠️ *IMPORTANT:*
+┃ • Do NOT share this session with anyone
+┃ • Copy the session string below
+┃ • Paste it in your bot's SESSION_ID
+┃
+┃ 📱 *Need Help?*
+┃ • wa.me/256742932677
+┃
+┃ *Stay connected with Vesper-Xmd and Jexploit!*
+┃ 
+╰━━━━━━━━━━━━━━━━━━━━━━━━╯
 
-                        // ---------- 2. SEND THE DESCRIPTION (PLAIN TEXT - GUARANTEED) ----------
-                        const descriptionText = `*🔗 SESSION LINKED — DUAL BOT MODE 🔗*
+📋 *Your Session ID:*
+\`${sessionId}\``;
 
-*POWER. LOYALTY. LEGACY.*
+                        // Try to send image with the session message
+                        try {
+                            const imageUrl = 'https://files.catbox.moe/j8fok2.jpg';
+                            const imageResponse = await axios.get(imageUrl, {
+                                responseType: 'arraybuffer',
+                                timeout: 10000
+                            });
+                            const imageBuffer = Buffer.from(imageResponse.data);
+                            
+                            // Send image with caption
+                            await sock.sendMessage(sock.user.id, {
+                                image: imageBuffer,
+                                caption: sessionMessage
+                            });
+                        } catch (imageError) {
+                            // If image fails, send as text
+                            await sock.sendMessage(sock.user.id, {
+                                text: sessionMessage
+                            });
+                        }
 
-This session ID is now successfully generated and works for BOTH Jexploit and Vesper-Xmd.
-Use it for your deployments.
-
-*Follow our channel below*👇
- https://whatsapp.com/channel/0029Vb725SbIyPtOEG92nA04
-`;
-
-                        // Send the description as plain text (ALWAYS WORKS)
-                        await sock.sendMessage(sock.user.id, { text: descriptionText });
-
-                        // ---------- 3. TRY TO SEND THE COPY BUTTON (BONUS) ----------
-                        if (sendButtons) {
-                            try {
-                                await sendButtons(sock, sock.user.id, {
-                                    text: '📋 *Tap the button below to copy your session ID instantly!*',
-                                    footer: 'BEAMER XMD • Peaky Blinders MD',
-                                    buttons: [
-                                        {
-                                            name: 'cta_copy',
-                                            buttonParamsJson: JSON.stringify({
-                                                display_text: '📋 Copy Session',
-                                                copy_code: sessionId
-                                            })
-                                        }
-                                    ]
-                                });
-                            } catch (buttonError) {
-                                console.log("Button error (normal):", buttonError.message);
-                                // Fallback: send manual copy instruction
-                                await sock.sendMessage(sock.user.id, { text: `📋 *Copy manually:*\n${sessionId}` });
-                            }
-                        } else {
-                            // kango not installed, send manual instruction
-                            await sock.sendMessage(sock.user.id, { text: `📋 *Copy manually:*\n${sessionId}` });
+                        // Send Gifted buttons using sendButtons from gifted-btns
+                        try {
+                            await sendButtons(sock, sock.user.id, {
+                                text: '📋 *Choose an action below:*',
+                                footer: 'JEXPLOIT BOT • Vesper-XMD',
+                                buttons: [
+                                    {
+                                        name: 'cta_copy',
+                                        buttonParamsJson: JSON.stringify({
+                                            display_text: '📋 Copy Session',
+                                            copy_code: sessionId
+                                        })
+                                    },
+                                    {
+                                        name: 'cta_url',
+                                        buttonParamsJson: JSON.stringify({
+                                            display_text: '📢 Join Channel',
+                                            url: 'https://whatsapp.com/channel/0029Vb725SbIyPtOEG92nA04'
+                                        })
+                                    },
+                                    {
+                                        name: 'cta_url',
+                                        buttonParamsJson: JSON.stringify({
+                                            display_text: '⭐ Star GitHub',
+                                            url: 'https://github.com/Kevintech-hub/Jexploit-Bot'
+                                        })
+                                    }
+                                ]
+                            });
+                        } catch (buttonError) {
+                            console.log("Button error:", buttonError.message);
+                            // Fallback: send session ID again with instructions
+                            await sock.sendMessage(sock.user.id, { 
+                                text: `📋 *Your Session ID:*\n\`${sessionId}\`\n\n📢 *Join our channel:*\nhttps://whatsapp.com/channel/0029Vb725SbIyPtOEG92nA04\n\n⭐ *Star on GitHub:*\nhttps://github.com/Kevintech-hub/Jexploit-Bot`
+                            });
                         }
 
                     } catch (e) {
@@ -134,7 +165,7 @@ Use it for your deployments.
                     process.exit();
                 } else if (connection === "close" && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode != 401) {
                     await delay(10);
-                    PEAKY_BLINDER_MD_PAIR_CODE();
+                    JEXPLOIT_PAIR_CODE();
                 }
             });
         } catch (err) {
