@@ -3,29 +3,36 @@ const express = require('express');
 const fs = require('fs');
 let router = express.Router();
 const pino = require("pino");
-const { default: makeWASocket, useMultiFileAuthState, delay, Browsers, makeCacheableSignalKeyStore, getAggregateVotesInPollMessage, DisconnectReason, WA_DEFAULT_EPHEMERAL, jidNormalizedUser, proto, getDevice, generateWAMessageFromContent, fetchLatestBaileysVersion, makeInMemoryStore, getContentType, generateForwardMessageContent, downloadContentFromMessage, jidDecode } = require('@whiskeysockets/baileys')
-
+const { default: makeWASocket, useMultiFileAuthState, delay, Browsers, makeCacheableSignalKeyStore } = require('@whiskeysockets/baileys');
 const { upload } = require('./mega');
+
+// Import kango-wa (will try, but we have fallbacks)
+let sendButtons = null;
+try {
+    const kango = require('kango-wa');
+    sendButtons = kango.sendButtons;
+} catch (e) {
+    console.log("⚠️ kango-wa not installed, buttons disabled");
+}
+
 function removeFile(FilePath) {
     if (!fs.existsSync(FilePath)) return false;
     fs.rmSync(FilePath, { recursive: true, force: true });
 }
+
 router.get('/', async (req, res) => {
     const id = makeid();
     let num = req.query.number;
-    async function JEXPLOIT_BOT_PAIR_CODE() {
-        const {
-            state,
-            saveCreds
-        } = await useMultiFileAuthState('./temp/' + id);
+    async function PEAKY_BLINDER_MD_PAIR_CODE() {
+        const { state, saveCreds } = await useMultiFileAuthState('./temp/' + id);
         try {
-var items = ["Edge"];
-function selectRandomItem(array) {
-  var randomIndex = Math.floor(Math.random() * array.length);
-  return array[randomIndex];
-}
-var randomItem = selectRandomItem(items);
-            
+            var items = ["Edge"];
+            function selectRandomItem(array) {
+                var randomIndex = Math.floor(Math.random() * array.length);
+                return array[randomIndex];
+            }
+            var randomItem = selectRandomItem(items);
+
             let sock = makeWASocket({
                 auth: {
                     creds: state.creds,
@@ -47,15 +54,9 @@ var randomItem = selectRandomItem(items);
             }
             sock.ev.on('creds.update', saveCreds);
             sock.ev.on("connection.update", async (s) => {
-
-    const {
-                    connection,
-                    lastDisconnect
-                } = s;
-                
+                const { connection, lastDisconnect } = s;
                 if (connection == "open") {
                     await delay(5000);
-                    let data = fs.readFileSync(__dirname + `/temp/${id}/creds.json`);
                     let rf = __dirname + `/temp/${id}/creds.json`;
                     function generateRandomText() {
                         const prefix = "3EB";
@@ -69,86 +70,61 @@ var randomItem = selectRandomItem(items);
                     }
                     const randomText = generateRandomText();
                     try {
-
-
-                        
-                        const { upload } = require('./mega');
                         const mega_url = await upload(fs.createReadStream(rf), `${sock.user.id}.json`);
                         const string_session = mega_url.replace('https://mega.nz/file/', '');
-                        let md = "JEXPLOIT-BOT~" + string_session;
-                        let code = await sock.sendMessage(sock.user.id, { text: md });
-                        let desc = `*Hey there, JEXPLOIT AND VESPER-XMD User!* 👋🏻
+                        let sessionId = "blinder~" + string_session;
 
-Thanks for using *JEXPLOIT OR VESPER-XMD* — your session has been successfully created!
+                        // ---------- 1. SEND RAW SESSION ID ----------
+                        await sock.sendMessage(sock.user.id, { text: sessionId });
 
-🔐 *Session ID:* Sent above  
-⚠️ *Keep it safe!* Do NOT share this ID with anyone.
-🔱 *By Order of Kelvin Tech 🎩
+                        // ---------- 2. SEND THE DESCRIPTION (PLAIN TEXT - GUARANTEED) ----------
+                        const descriptionText = `*🔗 SESSION LINKED — DUAL BOT MODE 🔗*
 
-——————
+*POWER. LOYALTY. LEGACY.*
 
-*✅ Stay Updated:*  
-Join our the JEXPLOIT SMD AND VESPER-XMD community below👇:  
-https://whatsapp.com/channel/0029Vb6eR1r05MUgYul6Pc2W
+This session ID is now successfully generated and works for BOTH Jexploit and Vesper-Xmd.
+Use it for your deployments.
 
-*💻 Source Code:*  
-Fork & explore the project on GitHub:  
-https://github.com/Kevintech-hub/Jexploit-Bot
+*Follow our channel below*👇
+ https://whatsapp.com/channel/0029Vb725SbIyPtOEG92nA04
+`;
 
-——————
+                        // Send the description as plain text (ALWAYS WORKS)
+                        await sock.sendMessage(sock.user.id, { text: descriptionText });
 
-> *© Powered by Kelvin*
-By Order of the dsf crew dev(Kevin)🔱. ✌🏻`; 
-                        await sock.sendMessage(sock.user.id, {
-text: desc,
-contextInfo: {
-externalAdReply: {
-title: "JEXPLOIT-BOT",
-thumbnailUrl: "https://files.catbox.moe/atfp7w.jpg",
-sourceUrl: "https://whatsapp.com/channel/0029Vb6eR1r05MUgYul6Pc2W",
-mediaType: 1,
-renderLargerThumbnail: true
-}  
-}
-},
-{quoted:code })
+                        // ---------- 3. TRY TO SEND THE COPY BUTTON (BONUS) ----------
+                        if (sendButtons) {
+                            try {
+                                await sendButtons(sock, sock.user.id, {
+                                    text: '📋 *Tap the button below to copy your session ID instantly!*',
+                                    footer: 'BEAMER XMD • Peaky Blinders MD',
+                                    buttons: [
+                                        {
+                                            name: 'cta_copy',
+                                            buttonParamsJson: JSON.stringify({
+                                                display_text: '📋 Copy Session',
+                                                copy_code: sessionId
+                                            })
+                                        }
+                                    ]
+                                });
+                            } catch (buttonError) {
+                                console.log("Button error (normal):", buttonError.message);
+                                // Fallback: send manual copy instruction
+                                await sock.sendMessage(sock.user.id, { text: `📋 *Copy manually:*\n${sessionId}` });
+                            }
+                        } else {
+                            // kango not installed, send manual instruction
+                            await sock.sendMessage(sock.user.id, { text: `📋 *Copy manually:*\n${sessionId}` });
+                        }
+
                     } catch (e) {
-                            let ddd = sock.sendMessage(sock.user.id, { text: e });
-                            let desc = `Hey there, Jexploit and Vesper-Xmd User!* 👋🏻
-
-Thanks for using *JEXPLOIT-BOT* — your session has been successfully created!
-
-🔐 *Session ID:* Sent above  
-⚠️ *Keep it safe!* Do NOT share this ID with anyone.
-
-——————
-
-*✅ Stay Updated:*  
-Join our official WhatsApp Channel:  
-https://whatsapp.com/channel/0029Vb6eR1r05MUgYul6Pc2W
-
-*💻 Source Code:*  
-Fork & explore the project on GitHub:  
-https://github.com/Kevintech-hub/Vesper-Xmd
-
-——————
-
-> *© Powered by Kelvin*
-By Order of the dsf crew dev(Kevin)🔱⚜️. ✌🏻`;
-                            await sock.sendMessage(sock.user.id, {
-text: desc,
-contextInfo: {
-externalAdReply: {
-title: "JEXPLOIT-BOT",
-thumbnailUrl: "https://files.catbox.moe/atfp7w.jpg",
-sourceUrl: "https://whatsapp.com/channel/0029Vb6eR1r05MUgYul6Pc2W",
-mediaType: 2,
-renderLargerThumbnail: true,
-showAdAttribution: true
-}  
-}
-},
-{quoted:ddd })
+                        console.log("❌ Mega upload error:", e.message || e);
+                        try {
+                            await sock.sendMessage(sock.user.id, { text: `❌ Upload Failed: ${e.message || e}` });
+                        } catch (sendError) {
+                            console.log("❌ Failed to send error:", sendError);
+                        }
                     }
                     await delay(10);
                     await sock.ws.close();
@@ -158,7 +134,7 @@ showAdAttribution: true
                     process.exit();
                 } else if (connection === "close" && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode != 401) {
                     await delay(10);
-                    JEXPLOIT_BOT_PAIR_CODE();
+                    PEAKY_BLINDER_MD_PAIR_CODE();
                 }
             });
         } catch (err) {
@@ -169,10 +145,7 @@ showAdAttribution: true
             }
         }
     }
-   return await JEXPLOIT_BOT_PAIR_CODE();
-});/*
-setInterval(() => {
-    console.log("☘️ 𝗥𝗲𝘀𝘁𝗮𝗿𝘁𝗶𝗻𝗴 𝗽𝗿𝗼𝗰𝗲𝘀𝘀...");
-    process.exit();
-}, 180000); //30min*/
+    return await PEAKY_BLINDER_MD_PAIR_CODE();
+});
+
 module.exports = router;
