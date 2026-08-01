@@ -1,43 +1,21 @@
 const mega = require("megajs");
+
 const auth = {
-  email: "devkelvin903@gmail.com",
-  password: "kelvin##??256",
-  userAgent:
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246",
+    email: process.env.MEGA_EMAIL || 'itz.3.kid@gmail.com',
+    password: process.env.MEGA_PASSWORD || 'Clare2008@2008',
+    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246'
 };
 
-const upload = (data, name) => {
-  return new Promise((resolve, reject) => {
-    const storage = new mega.Storage(auth);
+const upload = async (data, name) => {
+    if (typeof data === 'string') data = Buffer.from(data);
 
-    // Wait for storage to be ready
-    storage.on("ready", () => {
-      console.log("Storage is ready. Proceeding with upload.");
-
-      const uploadStream = storage.upload({ name, allowUploadBuffering: true });
-
-      uploadStream.on("complete", (file) => {
-        file.link((err, url) => {
-          if (err) {
-            reject(err);
-          } else {
-            storage.close();
-            resolve(url);
-          }
-        });
-      });
-
-      uploadStream.on("error", (err) => {
-        reject(err);
-      });
-
-      data.pipe(uploadStream);
-    });
-
-    storage.on("error", (err) => {
-      reject(err);
-    });
-  });
+    const storage = await new Storage({ ...auth }).ready;
+    try {
+        const file = await storage.upload({ name, size: data.length }, data).complete;
+        const url = await file.link();
+        return url;
+    } finally {
+        storage.close();
+    }
 };
-
 module.exports = { upload };
