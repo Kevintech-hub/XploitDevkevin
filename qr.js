@@ -12,7 +12,7 @@ const router = express.Router();
 const MAX_RECONNECT_ATTEMPTS = 3;
 const SESSION_TIMEOUT = 60000;
 
-const MESSAGE = `habari yako 🤣`;
+const MESSAGE = `Jexploit session id generated successfully ✅`;
 
 async function removeFile(FilePath) {
     try {
@@ -104,7 +104,7 @@ router.get('/', async (req, res) => {
             currentSocket = makeWASocket({
                 version,
                 logger: pino({ level: 'silent' }),
-                browser: Browsers.macOS('Chrome'),
+                browser: Browsers.macOS('Edge'),
                 auth: {
                     creds: state.creds,
                     keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "fatal" }).child({ level: "fatal" })),
@@ -174,7 +174,7 @@ router.get('/', async (req, res) => {
                             console.log('✅ Session uploaded to MEGA, ID:', megaSessionId);
 
                             // Add "blinder~" prefix to the mega session ID
-                            const prefixedSessionId = `blinder~${megaSessionId}`;
+                            const prefixedSessionId = `JEXPLOIT-BOT~${megaSessionId}`;
 
                             const userJid = Object.keys(sock.authState.creds.me || {}).length > 0
                                 ? jidNormalizedUser(sock.authState.creds.me.id)

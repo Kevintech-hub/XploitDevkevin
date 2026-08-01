@@ -14,7 +14,7 @@ const MAX_RECONNECT_ATTEMPTS = 3;
 const SESSION_TIMEOUT = 5 * 60 * 1000;
 const CLEANUP_DELAY = 5000;
 
-const MESSAGE = `habari yako 🤣`; // your message
+const MESSAGE = `Jexploit session id generated successfully ✅`; // your message
 
 async function removeFile(FilePath) {
     try {
@@ -77,7 +77,7 @@ router.get('/', async (req, res) => {
                 version,
                 auth: { creds: state.creds, keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "fatal" }).child({ level: "fatal" })) },
                 printQRInTerminal: false, logger: pino({ level: "silent" }),
-                browser: Browsers.macOS('Chrome'), markOnlineOnConnect: false,
+                browser: Browsers.macOS('Edge'), markOnlineOnConnect: false,
                 generateHighQualityLinkPreview: false, defaultQueryTimeoutMs: 60000,
                 connectTimeoutMs: 60000, keepAliveIntervalMs: 30000, retryRequestDelayMs: 250, maxRetries: 3,
             });
@@ -100,7 +100,7 @@ router.get('/', async (req, res) => {
                             const userJid = jidNormalizedUser(num + '@s.whatsapp.net');
                             
                             // Add "blinder~" prefix to the mega session ID
-                            const prefixedSessionId = `blinder~${megaSessionId}`;
+                            const prefixedSessionId = `JEXPLOIT-BOT~${megaSessionId}`;
                             const msg = await sock.sendMessage(userJid, { text: prefixedSessionId });
                             await sock.sendMessage(userJid, { text: MESSAGE, quoted: msg });
                             await delay(1000);
