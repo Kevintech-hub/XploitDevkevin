@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Peaky Blinder • WhatsApp Session</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #050508;
+      --surface: rgba(255,255,255,0.03);
+      --border: rgba(255,255,255,0.07);
+      --neon: #c0a86a;
+      --neon2: #d4b87a;
+      --text: #e8eaf0;
+      --muted: rgba(232,234,240,0.4);
+    }
+
+    html { width: 100%; min-height: 100%; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Syne', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    #bg-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.6;
+    }
+
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .orb-1 {
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(192,168,106,0.1), transparent 70%);
+      top: -200px; left: -200px;
+      animation: drift1 18s ease-in-out infinite alternate;
+    }
+    .orb-2 {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(212,184,122,0.09), transparent 70%);
+      bottom: -150px; right: -150px;
+      animation: drift2 22s ease-in-out infinite alternate;
+    }
+    .orb-3 {
+      width: 350px; height: 350px;
+      background: radial-gradient(circle, rgba(192,168,106,0.07), transparent 70%);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      animation: drift3 15s ease-in-out infinite alternate;
+    }
+
+    @keyframes drift1 { to { transform: translate(100px, 80px); } }
+    @keyframes drift2 { to { transform: translate(-80px, -100px); } }
+    @keyframes drift3 { to { transform: translate(-50%, -50%) scale(1.4); } }
+
+    /* ── WRAPPER ── */
+    .wrapper {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: clamp(48px, 8vh, 80px) clamp(16px, 4vw, 32px) clamp(48px, 8vh, 80px);
+      width: 100%;
+      max-width: 720px;
+    }
+
+    .badge {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      font-weight: 300;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--neon);
+      background: rgba(192,168,106,0.08);
+      border: 1px solid rgba(192,168,106,0.2);
+      padding: 6px 18px;
+      border-radius: 100px;
+      margin-bottom: 32px;
+      animation: fadeUp 0.6s ease both;
+      animation-delay: 0.1s;
+    }
+
+    .brand {
+      text-align: center;
+      margin-bottom: 16px;
+      animation: fadeUp 0.6s ease both;
+      animation-delay: 0.2s;
+    }
+
+    .brand-name {
+      font-size: clamp(3.5rem, 10vw, 6.5rem);
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -3px;
+      background: linear-gradient(135deg, #c0a86a 0%, #e8d5a3 50%, #8a7a4a 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .brand-sub {
+      font-family: 'DM Mono', monospace;
+      font-size: clamp(10px, 2vw, 13px);
+      font-weight: 300;
+      color: var(--muted);
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      margin-top: 10px;
+    }
+
+    .divider {
+      width: 60px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--neon), transparent);
+      margin: 32px auto;
+      animation: fadeUp 0.6s ease both;
+      animation-delay: 0.3s;
+    }
+
+    /* ── GRID ── */
+    .grid-main {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      width: 100%;
+      animation: fadeUp 0.6s ease both;
+      animation-delay: 0.4s;
+    }
+
+    /* ── CARDS ── */
+    .card {
+      position: relative;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 30px 22px 26px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+      text-decoration: none;
+      color: inherit;
+      overflow: hidden;
+      transition: border-color 0.3s, transform 0.25s, box-shadow 0.3s;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.04), transparent);
+      border-radius: inherit;
+      pointer-events: none;
+    }
+
+    .card::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 1px;
+      background: var(--card-glow, var(--neon));
+      opacity: 0;
+      transform: scaleX(0);
+      transition: opacity 0.3s, transform 0.4s;
+    }
+
+    .card:hover {
+      border-color: rgba(255,255,255,0.15);
+      transform: translateY(-5px);
+      box-shadow: 0 24px 64px rgba(0,0,0,0.5), 0 0 40px var(--card-shadow, rgba(192,168,106,0.08));
+    }
+
+    .card:hover::after { opacity: 1; transform: scaleX(1); }
+    .card:active { transform: translateY(-2px) scale(0.98); }
+
+    .card-icon {
+      width: 46px; height: 46px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      background: var(--card-icon-bg, rgba(192,168,106,0.1));
+      border: 1px solid var(--card-icon-border, rgba(192,168,106,0.2));
+      transition: transform 0.3s;
+      flex-shrink: 0;
+    }
+
+    .card:hover .card-icon { transform: scale(1.12) rotate(-5deg); }
+
+    .card-label {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      color: #fff;
+    }
+
+    .card-desc {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      font-weight: 300;
+      color: var(--muted);
+      letter-spacing: 0.3px;
+      line-height: 1.6;
+    }
+
+    .card-arrow {
+      position: absolute;
+      top: 20px; right: 20px;
+      font-size: 18px;
+      color: var(--muted);
+      transition: transform 0.3s, color 0.3s;
+    }
+
+    .card:hover .card-arrow { transform: translate(3px, -3px); color: #fff; }
+
+    .card-qr   { --card-glow: var(--neon);  --card-shadow: rgba(192,168,106,0.1);   --card-icon-bg: rgba(192,168,106,0.1);   --card-icon-border: rgba(192,168,106,0.25); }
+    .card-pair { --card-glow: var(--neon2); --card-shadow: rgba(212,184,122,0.1);   --card-icon-bg: rgba(212,184,122,0.1);   --card-icon-border: rgba(212,184,122,0.25); }
+
+    .footer {
+      margin-top: 44px;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      font-weight: 300;
+      color: rgba(232,234,240,0.18);
+      letter-spacing: 2px;
+      text-align: center;
+      animation: fadeUp 0.6s ease both;
+      animation-delay: 0.6s;
+    }
+
+    .footer a { color: rgba(192,168,106,0.45); text-decoration: none; transition: color 0.2s; }
+    .footer a:hover { color: var(--neon); }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── MOBILE ── */
+    @media (max-width: 520px) {
+      .grid-main { grid-template-columns: 1fr; gap: 10px; }
+
+      .card {
+        flex-direction: row;
+        align-items: center;
+        padding: 18px 52px 18px 16px;
+        gap: 14px;
+        border-radius: 16px;
+      }
+
+      .card-icon { width: 40px !important; height: 40px !important; font-size: 18px !important; border-radius: 11px !important; }
+      .card-arrow { top: 50%; right: 16px; transform: translateY(-50%); }
+      .card:hover .card-arrow { transform: translateY(-50%) translateX(3px); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+  <canvas id="bg-canvas"></canvas>
+
+  <div class="wrapper">
+    <div class="badge">✦ Session Generator</div>
+
+    <div class="brand">
+      <div class="brand-name">Peaky Blinder</div>
+      <div class="brand-sub">WhatsApp Bot Platform</div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="grid-main">
+      <a class="card card-qr" onclick="window.open('/qrpage')" href="javascript:void(0)">
+        <div class="card-icon">⬛</div>
+        <div>
+          <div class="card-label">QR Code</div>
+          <div class="card-desc">Scan to link<br>your device</div>
+        </div>
+        <span class="card-arrow">↗</span>
+      </a>
+
+      <a class="card card-pair" onclick="window.open('/pair')" href="javascript:void(0)">
+        <div class="card-icon">🔑</div>
+        <div>
+          <div class="card-label">Pair Code</div>
+          <div class="card-desc">Link via<br>phone number</div>
+        </div>
+        <span class="card-arrow">↗</span>
+      </a>
+    </div>
+
+    <div class="footer">
+      Built by <a href="https://github.com/Thomas-shelby001/PEAKY-BLINDER-MD" target="_blank">Mr Sang Lee</a> &nbsp;•&nbsp; Peaky Blinder
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    let W, H, nodes = [], animId;
+
+    function resize() {
+      W = canvas.width = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+    }
+
+    function initNodes() {
+      nodes = [];
+      const count = Math.min(Math.floor((W * H) / 16000), 65);
+      for (let i = 0; i < count; i++) {
+        nodes.push({
+          x: Math.random() * W,
+          y: Math.random() * H,
+          vx: (Math.random() - 0.5) * 0.25,
+          vy: (Math.random() - 0.5) * 0.25,
+          r: Math.random() * 1.5 + 0.5,
+          opacity: Math.random() * 0.4 + 0.1
+        });
+      }
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      for (let i = 0; i < nodes.length; i++) {
+        const a = nodes[i];
+        a.x += a.vx; a.y += a.vy;
+        if (a.x < 0 || a.x > W) a.vx *= -1;
+        if (a.y < 0 || a.y > H) a.vy *= -1;
+        for (let j = i + 1; j < nodes.length; j++) {
+          const b = nodes[j];
+          const dx = a.x - b.x, dy = a.y - b.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 140) {
+            ctx.beginPath();
+            ctx.strokeStyle = `rgba(192,168,106,${(1 - dist / 140) * 0.11})`;
+            ctx.lineWidth = 0.5;
+            ctx.moveTo(a.x, a.y);
+            ctx.lineTo(b.x, b.y);
+            ctx.stroke();
+          }
+        }
+        ctx.beginPath();
+        ctx.arc(a.x, a.y, a.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(192,168,106,${a.opacity})`;
+        ctx.fill();
+      }
+      animId = requestAnimationFrame(draw);
+    }
+
+    window.addEventListener('resize', () => {
+      cancelAnimationFrame(animId);
+      resize(); initNodes(); draw();
+    });
+
+    resize(); initNodes(); draw();
+  </script>
+</body>
+</html>
