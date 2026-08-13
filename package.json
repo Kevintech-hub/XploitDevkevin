@@ -11,11 +11,11 @@
     "start": "node index.js",
     "dev": "nodemon index.js"
   },
-  "author": "MrSangLee",
+  "author": "Kelvin",
   "license": "MIT",
   "dependencies": {
     "@hapi/boom": "^10.0.1",
-    "@whiskeysockets/baileys": "^7.0.0-rc13",
+    "@whiskeysockets/baileys": "npm:wileys",
     "awesome-phonenumber": "^5.9.0",
     "dotenv": "^16.4.7",
     "fs-extra": "^11.3.0",
