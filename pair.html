@@ -1,262 +1,212 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JEXPLOIT • Pair Code</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-  :root{
-    --void:#0B1220;
-    --panel:#121B2E;
-    --panel-2:#0E1729;
-    --line:rgba(148,180,214,0.12);
-    --line-strong:rgba(148,180,214,0.3);
-    --signal:#5EEAD4;
-    --signal-soft:rgba(94,234,212,0.12);
-    --pulse:#FB7185;
-    --pulse-soft:rgba(251,113,133,0.12);
-    --ink:#EAF2FB;
-    --dim:#8496AD;
-    --dim-2:#4B5A70;
-  }
-  html{width:100%;min-height:100%;}
-  body{
-    background:var(--void);
-    color:var(--ink);
-    font-family:'Space Grotesk',sans-serif;
-    min-height:100vh;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    position:relative;
-    overflow-x:hidden;
-  }
-  body::before{
-    content:'';
-    position:fixed; inset:0;
-    background-image:
-      linear-gradient(var(--line) 1px, transparent 1px),
-      linear-gradient(90deg, var(--line) 1px, transparent 1px);
-    background-size:46px 46px;
-    -webkit-mask-image:radial-gradient(ellipse 75% 55% at 50% 38%, #000 35%, transparent 100%);
-    mask-image:radial-gradient(ellipse 75% 55% at 50% 38%, #000 35%, transparent 100%);
-    z-index:0; pointer-events:none;
-  }
-  .sweep{
-    position:fixed; top:38%; left:50%; width:900px; height:900px;
-    transform:translate(-50%,-50%);
-    background:conic-gradient(from 0deg, transparent 0deg, var(--signal-soft) 8deg, transparent 40deg, transparent 360deg);
-    animation:sweep 9s linear infinite;
-    z-index:0; pointer-events:none;
-    border-radius:50%;
-  }
-  @keyframes sweep{to{transform:translate(-50%,-50%) rotate(360deg);}}
-  .ring{position:fixed; top:38%; left:50%; border:1px solid var(--line); border-radius:50%; transform:translate(-50%,-50%); z-index:0; pointer-events:none;}
-  .ring-1{animation:ringPulse 4.5s ease-out infinite;}
-  .ring-2{animation:ringPulse 4.5s ease-out infinite 1.5s;}
-  .ring-3{animation:ringPulse 4.5s ease-out infinite 3s;}
-  @keyframes ringPulse{0%{width:80px;height:80px;opacity:0.45;}100%{width:820px;height:820px;opacity:0;}}
-  @keyframes breathe{0%,100%{opacity:1;}50%{opacity:0.3;}}
-  @keyframes blink{50%{opacity:0;}}
-  @keyframes spin{to{transform:rotate(360deg);}}
-  @media (prefers-reduced-motion: reduce){
-    .sweep,.ring-1,.ring-2,.ring-3,.led,.cursor{animation:none !important;}
-  }
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>JEXPLOIT AND VESPER-XMD PAIR CODE | WHATSAPP CONNECT</title>
+  <meta name="theme-color" content="#1a0a0a" />
+  <link rel="icon" href="https://files.catbox.moe/b2oixn.jpg">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" />
 
-  .page{position:relative; z-index:2; display:flex; flex-direction:column; align-items:center; width:100%; max-width:560px; padding:clamp(40px,8vh,72px) clamp(18px,4vw,32px);}
+  <style>
+    :root {
+      --gold:#d4af37;
+      --gold-light:#f5d77a;
+      --red:#8b0000;
+      --red-light:#c1121f;
+      --dark:#120404;
+      --darker:#1a0a0a;
+      --text:#fff5f5;
+      --gray:#e0cfcf;
+      --card-bg:rgba(212,175,55,0.06);
+      --shadow:0 15px 40px rgba(0,0,0,0.7);
+      --transition:all 0.3s ease;
+    }
 
-  .status-line{display:flex; align-items:center; gap:9px; font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:2.5px; text-transform:uppercase; color:var(--dim); margin-bottom:30px;}
-  .led{width:7px;height:7px;border-radius:50%; background:var(--signal); box-shadow:0 0 7px var(--signal); animation:breathe 2.1s ease-in-out infinite; flex-shrink:0; transition:background 0.3s, box-shadow 0.3s;}
+    * {box-sizing:border-box;margin:0;padding:0;transition:var(--transition);}
 
-  .wordmark{font-size:clamp(2.2rem,8vw,3rem); font-weight:700; letter-spacing:0.5px; color:var(--ink);}
-  .cursor{display:inline-block; width:0.5em; height:0.72em; background:var(--signal); margin-left:5px; animation:blink 1.1s step-end infinite; vertical-align:-0.06em;}
-  .wordmark-rule{width:100%; max-width:200px; height:1px; background:linear-gradient(90deg,var(--signal),transparent); margin:14px 0 10px;}
-  .tagline{font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:4px; text-transform:uppercase; color:var(--dim-2); margin-bottom:40px;}
+    body {
+      font-family:'Poppins',sans-serif;
+      color:var(--text);
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      background:linear-gradient(135deg,#1a0a0a 0%,#2b0f0f 40%,#4a1010 70%,#120404 100%);
+      background-attachment: fixed;
+      padding:20px;
+    }
 
-  .console{position:relative; background:var(--panel); border:1px solid var(--line-strong); width:100%;}
-  .console.locked .corner{opacity:1; box-shadow:0 0 7px var(--signal);}
-  .corner{position:absolute;width:14px;height:14px;border-color:var(--signal);border-style:solid;opacity:0.6;transition:opacity 0.3s, box-shadow 0.3s;}
-  .corner-tl{top:-1px;left:-1px;border-width:2px 0 0 2px;}
-  .corner-tr{top:-1px;right:-1px;border-width:2px 2px 0 0;}
-  .corner-bl{bottom:-1px;left:-1px;border-width:0 0 2px 2px;}
-  .corner-br{bottom:-1px;right:-1px;border-width:0 2px 2px 0;}
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 14px 20px;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(6px);
+      border-bottom: 1px solid rgba(212,175,55,0.3);
+      z-index: 1000;
+      text-align: center;
+    }
 
-  .console-main{width:100%; padding:32px 26px;}
-  .console-title{font-size:16px; font-weight:600; margin-bottom:6px;}
-  .console-hint{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--dim); line-height:1.6; margin-bottom:24px;}
+    .navbar .brand {
+      background: linear-gradient(90deg,var(--gold),var(--red-light));
+      -webkit-background-clip: text;
+      color: transparent;
+      font-weight: 800;
+      font-size: 1.2rem;
+      text-decoration: none;
+      letter-spacing: 0.5px;
+    }
 
-  .field-row{display:flex; gap:10px;}
-  .field{position:relative; flex:1;}
-  .field-prefix{position:absolute; left:13px; top:50%; transform:translateY(-50%); font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--signal); pointer-events:none;}
-  .field input{
-    width:100%; background:var(--panel-2); border:1px solid var(--line-strong); border-radius:4px;
-    padding:13px 13px 13px 30px; font-family:'IBM Plex Mono',monospace; font-size:14px; color:var(--ink);
-    outline:none; transition:border-color 0.2s, box-shadow 0.2s;
-  }
-  .field input::placeholder{color:var(--dim-2);}
-  .field input:focus{border-color:var(--signal); box-shadow:0 0 0 3px var(--signal-soft);}
-  .field input.error{border-color:var(--pulse); box-shadow:0 0 0 3px var(--pulse-soft);}
-  .field input::-webkit-outer-spin-button, .field input::-webkit-inner-spin-button{-webkit-appearance:none;}
+    .pair-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(212,175,55,0.3);
+      border-radius: 18px;
+      padding: 40px 30px;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: var(--shadow);
+      text-align: center;
+      backdrop-filter: blur(10px);
+    }
 
-  .btn-primary{
-    padding:13px 20px; background:var(--signal); border:1px solid var(--signal); border-radius:4px; color:var(--void);
-    font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:600; letter-spacing:1px; text-transform:uppercase;
-    cursor:pointer; white-space:nowrap; flex-shrink:0; transition:filter 0.2s, transform 0.15s;
-  }
-  .btn-primary:hover:not(:disabled){filter:brightness(1.1);}
-  .btn-primary:active:not(:disabled){transform:scale(0.97);}
-  .btn-primary:disabled{opacity:0.4; cursor:not-allowed;}
-  .btn-primary:focus-visible{outline:2px solid var(--ink); outline-offset:2px;}
+    .pair-card h1 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      background: linear-gradient(90deg,var(--gold-light),var(--red-light));
+      -webkit-background-clip: text;
+      color: transparent;
+      margin-bottom: 6px;
+    }
 
-  .msg{margin-top:16px; font-family:'IBM Plex Mono',monospace; font-size:12px; display:flex; align-items:center; gap:8px;}
-  .msg.error{color:var(--pulse);}
-  .msg.loading{color:var(--dim);}
-  .spinner{width:13px;height:13px;border:2px solid var(--line-strong);border-top-color:var(--signal);border-radius:50%;animation:spin 0.7s linear infinite;flex-shrink:0;}
+    .pair-card p {
+      color: var(--gray);
+      font-size: 0.95rem;
+      margin-bottom: 18px;
+    }
 
-  .result{margin-top:22px; background:var(--panel-2); border:1px solid var(--signal); border-radius:4px; padding:22px; text-align:center;}
-  .result-label{font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:3px; text-transform:uppercase; color:var(--dim); margin-bottom:12px;}
-  .result-code{font-family:'IBM Plex Mono',monospace; font-size:clamp(20px,6vw,28px); letter-spacing:5px; color:var(--signal); margin-bottom:16px; word-break:break-all;}
-  .btn-copy{
-    display:inline-flex; align-items:center; gap:7px; padding:8px 18px; background:transparent; border:1px solid var(--line-strong);
-    border-radius:100px; color:var(--dim); font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:1.5px;
-    text-transform:uppercase; cursor:pointer; transition:all 0.2s;
-  }
-  .btn-copy:hover{border-color:var(--signal); color:var(--signal);}
-  .btn-copy.copied{border-color:var(--signal); color:var(--signal); background:var(--signal-soft);}
-  .btn-copy:focus-visible{outline:2px solid var(--signal); outline-offset:2px;}
+    label {
+      display: block;
+      font-weight: 600;
+      text-align: left;
+      margin-bottom: 6px;
+    }
 
-  .back{margin-top:36px; font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:var(--dim-2); text-decoration:none; transition:color 0.2s;}
-  .back:hover{color:var(--dim);}
-  .back:focus-visible{outline:2px solid var(--signal); outline-offset:3px;}
+    input {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(212,175,55,0.4);
+      background: rgba(139,0,0,0.15);
+      color: var(--text);
+      font-size: 0.95rem;
+      margin-bottom: 16px;
+    }
 
-  @media(max-width:460px){
-    .field-row{flex-direction:column;}
-    .btn-primary{width:100%; padding:13px;}
-    .console-main{padding:26px 20px;}
-  }
-</style>
+    .pair-btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 700;
+      color: #fff;
+      background: linear-gradient(135deg,var(--red),var(--gold));
+      cursor: pointer;
+      margin-bottom: 15px;
+    }
+
+    .channel-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(212,175,55,0.15);
+      color: var(--gold-light);
+      border-radius: 25px;
+      padding: 8px 16px;
+      text-decoration: none;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+  </style>
 </head>
+
 <body>
 
-<div class="ring ring-1"></div><div class="ring ring-2"></div><div class="ring ring-3"></div>
-<div class="sweep"></div>
+  <nav class="navbar">
+    <a href="https://github.com/Kevintech-hub/Vesper-Xmd" class="brand">
+      <i class="fas fa-robot"></i> JEXPLOIT-BOT
+    </a>
+  </nav>
 
-<div class="page">
-  <div class="status-line"><span class="led" id="led"></span><span id="statusText">AWAITING INPUT</span></div>
+  <div class="pair-card">
+    <h1>JEXPLOIT- PAIRING CODE</h1>
+    <p>Enter your WhatsApp number without the + sign</p>
 
-  <div class="wordmark">JEXPLOIT<span class="cursor"></span></div>
-  <div class="wordmark-rule"></div>
-  <div class="tagline">Pairing Console</div>
+    <label for="number">Phone Number</label>
+    <input type="text" id="number" placeholder="e.g., 256xxxxxxxxxx" />
+    <button id="submit" class="pair-btn">GET CODE</button>
 
-  <div class="console" id="consoleFrame">
-    <span class="corner corner-tl"></span><span class="corner corner-tr"></span>
-    <span class="corner corner-bl"></span><span class="corner corner-br"></span>
-    <div class="console-main">
-      <div class="console-title">Link your device</div>
-      <div class="console-hint">Enter your phone number with country code (no + or spaces)</div>
+    <a href="https://whatsapp.com/channel/0029Vb6eR1r05MUgYul6Pc2W" target="_blank" class="channel-btn">
+      <i class="fab fa-whatsapp"></i> Channel
+    </a>
 
-      <div class="field-row">
-        <div class="field">
-          <span class="field-prefix">+</span>
-          <input type="number" id="number" placeholder="256759XXXXXX" autocomplete="tel">
-        </div>
-        <button class="btn-primary" id="submit">Get Code</button>
-      </div>
-
-      <div id="msgArea"></div>
-      <div id="resultArea"></div>
-    </div>
+    <div id="pair" style="margin-top:20px;"></div>
   </div>
 
-  <a class="back" href="/">← Back to console</a>
-</div>
+  <!-- ✅ Updated axios (stable version) -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.0.0-alpha.1/axios.min.js"></script>
-<script>
-  const numInput = document.getElementById('number');
-  const submitBtn = document.getElementById('submit');
-  const msgArea = document.getElementById('msgArea');
-  const resultArea = document.getElementById('resultArea');
-  const statusText = document.getElementById('statusText');
-  const led = document.getElementById('led');
-  const consoleFrame = document.getElementById('consoleFrame');
+  <script>
+    let a = document.getElementById("pair");
+    let b = document.getElementById("submit");
+    let c = document.getElementById("number");
 
-  function setMsg(text, type){
-    if(!text){ msgArea.innerHTML=''; return; }
-    const icon = type==='loading' ? '<span class="spinner"></span>' : type==='error' ? '✕' : '';
-    msgArea.innerHTML = `<div class="msg ${type}">${icon}<span>${text}</span></div>`;
-  }
+    async function Copy() {
+      let text = document.getElementById("copy").innerText;
+      let obj = document.getElementById("copy");
+      await navigator.clipboard.writeText(obj.innerText.replace('CODE: ', ''));
+      obj.innerText = "COPIED";
+      obj.style = "color:gold;font-weight:bold";
+      setTimeout(() => {
+        obj.innerText = text;
+        obj.style = "color:red;font-weight:bold";
+      }, 500);
+    }
 
-  function setStatus(text, mode){
-    statusText.textContent = text;
-    led.style.background = mode==='error' ? 'var(--pulse)' : 'var(--signal)';
-    led.style.boxShadow = mode==='error' ? '0 0 7px var(--pulse)' : '0 0 7px var(--signal)';
-  }
+    b.addEventListener("click", async (e) => {
+      e.preventDefault();
 
-  function showCode(code){
-    resultArea.innerHTML = `
-      <div class="result">
-        <div class="result-label">Pair Code</div>
-        <div class="result-code" id="codeVal">${code}</div>
-        <button class="btn-copy" id="copyBtn">Copy Code</button>
-      </div>`;
-    consoleFrame.classList.add('locked');
-    document.getElementById('copyBtn').addEventListener('click', async () => {
-      const btn = document.getElementById('copyBtn');
-      const val = document.getElementById('codeVal').innerText;
-      try{
-        await navigator.clipboard.writeText(val);
-        btn.classList.add('copied');
-        btn.textContent = '✓ Copied';
-        setTimeout(() => { btn.classList.remove('copied'); btn.textContent = 'Copy Code'; }, 2000);
-      }catch(e){}
+      if (!c.value) {
+        a.innerHTML = '<a style="color:gold;font-weight:bold">Enter your WhatsApp number with a country code</a><br><br>';
+        return;
+      }
+
+      if (c.value.replace(/[^0-9]/g, "").length < 11) {
+        a.innerHTML = '<a style="color:gold;font-weight:bold">Invalid number format</a><br><br>';
+        return;
+      }
+
+      const bc = c.value.replace(/[^0-9]/g, "");
+      a.innerHTML = '<a style="color:gold;font-weight:bold">Please wait...</a><br><br>';
+
+      try {
+        let { data } = await axios.get(`/code?number=${bc}`);
+        let code = data.code || "Service Unavailable";
+
+        a.innerHTML =
+          '<font id="copy" onclick="Copy()" style="color:gold;font-weight:bold" size="5">CODE: <span style="color:white;font-weight:bold">' +
+          code +
+          '</span></font><br><br><br>';
+
+      } catch (err) {
+        a.innerHTML = '<a style="color:red;font-weight:bold">Error connecting to server</a><br><br>';
+      }
     });
-  }
+  </script>
 
-  submitBtn.addEventListener('click', async () => {
-    const raw = numInput.value.replace(/[^0-9]/g, '');
-    resultArea.innerHTML = '';
-    consoleFrame.classList.remove('locked');
-
-    if(!raw){
-      numInput.classList.add('error');
-      setMsg('Phone number is required', 'error');
-      setStatus('INPUT REQUIRED', 'error');
-      return;
-    }
-    if(raw.length < 10){
-      numInput.classList.add('error');
-      setMsg('Invalid number — include country code', 'error');
-      setStatus('INPUT REQUIRED', 'error');
-      return;
-    }
-
-    numInput.classList.remove('error');
-    submitBtn.disabled = true;
-    setMsg('Requesting pair code…', 'loading');
-    setStatus('REQUESTING', 'ok');
-
-    try{
-      const { data } = await axios(`/code?number=${raw}`);
-      const code = data.code || 'Service Unavailable';
-      setMsg('');
-      showCode(code);
-      setStatus('CODE ACQUIRED', 'ok');
-    }catch(err){
-      setMsg('Failed to get pair code. Try again.', 'error');
-      setStatus('REQUEST FAILED', 'error');
-    }finally{
-      submitBtn.disabled = false;
-    }
-  });
-
-  numInput.addEventListener('keydown', (e) => { if(e.key === 'Enter') submitBtn.click(); });
-  numInput.addEventListener('input', () => numInput.classList.remove('error'));
-</script>
 </body>
 </html>
