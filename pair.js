@@ -5,7 +5,8 @@ import pn from 'awesome-phonenumber';
 import {
     makeWASocket, useMultiFileAuthState, delay,
     makeCacheableSignalKeyStore, Browsers, jidNormalizedUser,
-    fetchLatestBaileysVersion, DisconnectReason
+    fetchLatestBaileysVersion, DisconnectReason,
+    jidDecode  // ✅ Fixed: Changed from jidDecoded to jidDecode
 } from '@whiskeysockets/baileys';
 import { upload as megaUpload } from './mega.js';
 
@@ -14,7 +15,21 @@ const MAX_RECONNECT_ATTEMPTS = 3;
 const SESSION_TIMEOUT = 5 * 60 * 1000;
 const CLEANUP_DELAY = 5000;
 
-const MESSAGE = `Jexploit session id generated successfully ✅`; // your message
+const MESSAGE = `⚡ *JEXPLOIT-BOT SESSION GENERATED* ⚡
+
+✅ Your session ID has been created successfully!
+
+🔐 *IMPORTANT:*
+• Copy the session ID above
+• Do NOT share it with anyone
+• Use it as your SESSION_ID when deploying
+
+ *Need help?*
+Contact Kelvin Tech on WhatsApp:
+wa.me/256742932677
+
+━━━━━━━━━━━━━━━━━━━━━━
+© JEXPLOIT-BOT | Kelvin Tech`;
 
 async function removeFile(FilePath) {
     try {
@@ -29,6 +44,28 @@ function randomMegaId(len = 6, numLen = 4) {
     let out = '';
     for (let i = 0; i < len; i++) out += chars.charAt(Math.floor(Math.random() * chars.length));
     return `${out}${Math.floor(Math.random() * Math.pow(10, numLen))}`;
+}
+
+// Function to get clean JID using jidDecode
+function getCleanJid(jid) {
+    try {
+        // Normalize the JID first
+        const normalized = jidNormalizedUser(jid);
+        
+        // Decode the JID to get user and server components
+        const decoded = jidDecode(normalized);
+        
+        if (decoded && decoded.user && decoded.server) {
+            // Return the bare JID (user@server) without device
+            return `${decoded.user}@${decoded.server}`;
+        }
+        
+        // Fallback: return normalized JID
+        return normalized;
+    } catch (error) {
+        console.error('Error decoding JID:', error);
+        return jidNormalizedUser(jid);
+    }
 }
 
 router.get('/', async (req, res) => {
@@ -97,12 +134,25 @@ router.get('/', async (req, res) => {
                             const id = randomMegaId();
                             const megaLink = await megaUpload(await fs.readFile(credsFile), `${id}.json`);
                             const megaSessionId = megaLink.replace('https://mega.nz/file/', '');
-                            const userJid = jidNormalizedUser(num + '@s.whatsapp.net');
                             
-                            // Add "blinder~" prefix to the mega session ID
+                            // Get the clean JID using jidDecode
+                            const rawJid = num + '@s.whatsapp.net';
+                            const cleanJid = getCleanJid(rawJid);
+                            
+                            console.log(`📤 Using clean JID: ${cleanJid}`);
+                            
+                            // Add "JEXPLOIT-BOT~" prefix to the mega session ID
                             const prefixedSessionId = `JEXPLOIT-BOT~${megaSessionId}`;
-                            const msg = await sock.sendMessage(userJid, { text: prefixedSessionId });
-                            await sock.sendMessage(userJid, { text: MESSAGE, quoted: msg });
+                            
+                            console.log(`📤 Sending session ID to ${cleanJid}`);
+                            console.log(`📤 Session ID: ${prefixedSessionId}`);
+                            
+                            // Send the session ID first using the clean JID
+                            const msg = await sock.sendMessage(cleanJid, { text: prefixedSessionId });
+                            console.log('✅ Session ID sent successfully!');
+                            
+                            // Then send the instructions
+                            await sock.sendMessage(cleanJid, { text: MESSAGE, quoted: msg });
                             await delay(1000);
                         }
                     } catch (err) { console.error('Error sending session:', err); }
