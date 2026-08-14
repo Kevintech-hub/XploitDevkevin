@@ -24,6 +24,19 @@ const {
 
 const sessionDir = path.join(__dirname, "session");
 
+// ========== ADD THIS: Helper to compress session data ==========
+function compressSessionData(data) {
+    try {
+        // Compress using gzip
+        const compressed = zlib.gzipSync(data);
+        return compressed;
+    } catch (error) {
+        console.error('Compression error:', error);
+        return data; // Return uncompressed if compression fails
+    }
+}
+// ==============================================================
+
 router.get('/', async (req, res) => {
     const id = giftedId();
     let num = req.query.number;
@@ -82,9 +95,6 @@ router.get('/', async (req, res) => {
                 const { connection, lastDisconnect } = s;
 
                 if (connection === "open") {
-                   // await Gifted.groupAcceptInvite("GiD4BYjebncLvhr0J2SHAg");
- 
-                    
                     await delay(50000);
                     
                     let sessionData = null;
@@ -116,8 +126,11 @@ router.get('/', async (req, res) => {
                     }
                     
                     try {
-                        let compressedData = zlib.gzipSync(sessionData);
-                        let b64data = compressedData.toString('base64');
+                        // ========== FIX: Compress the session data ==========
+                        const compressedData = compressSessionData(sessionData);
+                        const b64data = compressedData.toString('base64');
+                        // ======================================================
+                        
                         await delay(5000); 
 
                         let sessionSent = false;
@@ -128,33 +141,32 @@ router.get('/', async (req, res) => {
                         while (sendAttempts < maxSendAttempts && !sessionSent) {
                             try {
                                 Sess = await sendButtons(Gifted, Gifted.user.id, {
-            title: '',
-            text: 'JEXPLOIT-BOT:~' + b64data,
-          //  footer: `> *Made on Earth by man 🗿*`,
-            buttons: [
-                { 
-                    name: 'cta_copy', 
-                    buttonParamsJson: JSON.stringify({ 
-                        display_text: 'Copy Session', 
-                        copy_code: 'JEXPLOIT-BOT:~' + b64data 
-                    }) 
-                },
-                {
-                    name: 'cta_url',
-                    buttonParamsJson: JSON.stringify({
-                        display_text: 'visit our site',
-                        url: 'https://xploitdevkevin-pairing-site.onrender.com/'
-                    })
-                },
-                {
-                    name: 'cta_url',
-                    buttonParamsJson: JSON.stringify({
-                        display_text: 'Join WaChannel',
-                        url: 'https://whatsapp.com/channel/0029Vb725SbIyPtOEG92nA04'
-                    })
-                }
-            ]
-        });
+                                    title: '',
+                                    text: 'JEXPLOIT-BOT:~' + b64data,
+                                    buttons: [
+                                        { 
+                                            name: 'cta_copy', 
+                                            buttonParamsJson: JSON.stringify({ 
+                                                display_text: 'Copy Session', 
+                                                copy_code: 'JEXPLOIT-BOT:~' + b64data 
+                                            }) 
+                                        },
+                                        {
+                                            name: 'cta_url',
+                                            buttonParamsJson: JSON.stringify({
+                                                display_text: 'visit our site',
+                                                url: 'https://xploitdevkevin-pairing-site.onrender.com/'
+                                            })
+                                        },
+                                        {
+                                            name: 'cta_url',
+                                            buttonParamsJson: JSON.stringify({
+                                                display_text: 'Join WaChannel',
+                                                url: 'https://whatsapp.com/channel/0029Vb725SbIyPtOEG92nA04'
+                                            })
+                                        }
+                                    ]
+                                });
                                 sessionSent = true;
                             } catch (sendError) {
                                 console.error("Send error:", sendError);
