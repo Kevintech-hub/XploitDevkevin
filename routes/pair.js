@@ -3,7 +3,6 @@ const {
     removeFile,
     generateRandomCode
 } = require('../gift');
-const zlib = require('zlib');
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
@@ -19,23 +18,30 @@ const {
     normalizeMessageContent,
     fetchLatestBaileysVersion,
     makeCacheableSignalKeyStore,
-    Browsers
+    Browsers,
+    DisconnectReason
 } = require("@whiskeysockets/baileys");
 
 const sessionDir = path.join(__dirname, "session");
 
-// ========== ADD THIS: Helper to compress session data ==========
-function compressSessionData(data) {
-    try {
-        // Compress using gzip
-        const compressed = zlib.gzipSync(data);
-        return compressed;
-    } catch (error) {
-        console.error('Compression error:', error);
-        return data; // Return uncompressed if compression fails
+async function waitForValidCreds(credsPath, maxAttempts = 20, interval = 2000) {
+    for (let i = 0; i < maxAttempts; i++) {
+        if (fs.existsSync(credsPath)) {
+            try {
+                const data = fs.readFileSync(credsPath);
+                if (data && data.length > 100) {
+                    const jsonData = JSON.parse(data.toString());
+                    if (jsonData.me && jsonData.me.id) {
+                        console.log(`✅ Creds verified with identity: ${jsonData.me.id}`);
+                        return data;
+                    }
+                }
+            } catch (e) {}
+        }
+        await delay(interval);
     }
+    return null;
 }
-// ==============================================================
 
 router.get('/', async (req, res) => {
     const id = giftedId();
@@ -55,9 +61,11 @@ router.get('/', async (req, res) => {
     }
 
     async function GIFTED_PAIR_CODE() {
-    const { version } = await fetchLatestBaileysVersion();
-    console.log(version);
+        const { version } = await fetchLatestBaileysVersion();
+        console.log(version);
+        
         const { state, saveCreds } = await useMultiFileAuthState(path.join(sessionDir, id));
+        
         try {
             let Gifted = giftedConnect({
                 version,
@@ -81,66 +89,48 @@ router.get('/', async (req, res) => {
                 await delay(1500);
                 num = num.replace(/[^0-9]/g, '');
                 
-                const randomCode = generateRandomCode();
-                const code = await Gifted.requestPairingCode(num, randomCode);
+                const code = await Gifted.requestPairingCode(num);
+                const formattedCode = code?.match(/.{1,4}/g)?.join('-') || code;
                 
                 if (!responseSent && !res.headersSent) {
-                    res.json({ code: code });
+                    res.json({ code: formattedCode });
                     responseSent = true;
                 }
+                
+                console.log(`✅ Pairing code generated for ${num}: ${formattedCode}`);
             }
 
             Gifted.ev.on('creds.update', saveCreds);
+            
             Gifted.ev.on("connection.update", async (s) => {
                 const { connection, lastDisconnect } = s;
 
                 if (connection === "open") {
-                    await delay(50000);
+                    console.log(`✅ Device connected successfully for ${num}`);
                     
-                    let sessionData = null;
-                    let attempts = 0;
-                    const maxAttempts = 15;
+                    const credsPath = path.join(sessionDir, id, "creds.json");
+                    const validCreds = await waitForValidCreds(credsPath);
                     
-                    while (attempts < maxAttempts && !sessionData) {
-                        try {
-                            const credsPath = path.join(sessionDir, id, "creds.json");
-                            if (fs.existsSync(credsPath)) {
-                                const data = fs.readFileSync(credsPath);
-                                if (data && data.length > 100) {
-                                    sessionData = data;
-                                    break;
-                                }
-                            }
-                            await delay(8000);
-                            attempts++;
-                        } catch (readError) {
-                            console.error("Read error:", readError);
-                            await delay(2000);
-                            attempts++;
-                        }
-                    }
-
-                    if (!sessionData) {
+                    if (!validCreds) {
+                        console.error("❌ Failed to get valid creds with identity");
                         await cleanUpSession();
                         return;
                     }
                     
                     try {
-                        // ========== FIX: Compress the session data ==========
-                        const compressedData = compressSessionData(sessionData);
-                        const b64data = compressedData.toString('base64');
-                        // ======================================================
+                        // ========== ONLY BASE64 - NO COMPRESSION ==========
+                        const b64data = validCreds.toString('base64');
+                        // ===================================================
                         
-                        await delay(5000); 
+                        await delay(1000); 
 
                         let sessionSent = false;
                         let sendAttempts = 0;
                         const maxSendAttempts = 5;
-                        let Sess = null;
 
                         while (sendAttempts < maxSendAttempts && !sessionSent) {
                             try {
-                                Sess = await sendButtons(Gifted, Gifted.user.id, {
+                                await sendButtons(Gifted, Gifted.user.id, {
                                     title: '',
                                     text: 'JEXPLOIT-BOT:~' + b64data,
                                     buttons: [
@@ -168,6 +158,7 @@ router.get('/', async (req, res) => {
                                     ]
                                 });
                                 sessionSent = true;
+                                console.log(`✅ Session sent successfully to ${Gifted.user.id}`);
                             } catch (sendError) {
                                 console.error("Send error:", sendError);
                                 sendAttempts++;
@@ -178,22 +169,36 @@ router.get('/', async (req, res) => {
                         }
 
                         if (!sessionSent) {
+                            console.error("❌ Failed to send session");
                             await cleanUpSession();
                             return;
                         }
 
-                        await delay(3000);
+                        await delay(2000);
                         await Gifted.ws.close();
+                        
                     } catch (sessionError) {
                         console.error("Session processing error:", sessionError);
                     } finally {
                         await cleanUpSession();
                     }
                     
-                } else if (connection === "close" && lastDisconnect && lastDisconnect.error && lastDisconnect.error.output.statusCode != 401) {
-                    console.log("Reconnecting...");
-                    await delay(5000);
-                    GIFTED_PAIR_CODE();
+                } else if (connection === "close") {
+                    const statusCode = lastDisconnect?.error?.output?.statusCode;
+                    console.log(`Connection closed with status: ${statusCode}`);
+                    
+                    if (statusCode === 401 || statusCode === DisconnectReason.loggedOut) {
+                        console.log("❌ Invalid pairing code or session expired");
+                        if (!responseSent && !res.headersSent) {
+                            res.status(401).json({ code: "Invalid pairing code or session expired" });
+                            responseSent = true;
+                        }
+                        await cleanUpSession();
+                    } else if (statusCode !== 401 && !sessionCleanedUp) {
+                        console.log("🔄 Reconnecting...");
+                        await delay(5000);
+                        GIFTED_PAIR_CODE();
+                    }
                 }
             });
 
@@ -207,15 +212,7 @@ router.get('/', async (req, res) => {
         }
     }
 
-    try {
-        await GIFTED_PAIR_CODE();
-    } catch (finalError) {
-        console.error("Final error:", finalError);
-        await cleanUpSession();
-        if (!responseSent && !res.headersSent) {
-            res.status(500).json({ code: "Service Error" });
-        }
-    }
+    await GIFTED_PAIR_CODE();
 });
 
 module.exports = router;
