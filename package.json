@@ -1,6 +1,6 @@
 {
   "name": "jexploit-pairing-site",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "type": "module",
   "description": "A multi-functional WhatsApp bot Pairing Web and QR Scanner.",
   "main": "index.js",
@@ -15,7 +15,7 @@
   "license": "MIT",
   "dependencies": {
     "@hapi/boom": "^10.0.1",
-    "@whiskeysockets/baileys": "7.0.0-rc.13",
+    "@whiskeysockets/baileys": "npm:keithbaileys",
     "awesome-phonenumber": "^5.9.0",
     "dotenv": "^16.4.7",
     "fs-extra": "^11.3.0",
