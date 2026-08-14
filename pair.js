@@ -19,7 +19,8 @@ const {
     normalizeMessageContent,
     fetchLatestBaileysVersion,
     makeCacheableSignalKeyStore,
-    Browsers
+    Browsers,
+    DisconnectReason
 } = require("@whiskeysockets/baileys");
 
 const sessionDir = path.join(__dirname, "session");
@@ -33,6 +34,30 @@ function compressSessionData(data) {
         return data;
     }
 }
+
+// ========== FIX: Properly wait for creds.json with identity ==========
+async function waitForValidCreds(credsPath, maxAttempts = 20, interval = 2000) {
+    for (let i = 0; i < maxAttempts; i++) {
+        if (fs.existsSync(credsPath)) {
+            try {
+                const data = fs.readFileSync(credsPath);
+                if (data && data.length > 100) {
+                    // Verify it has valid JSON with me.id
+                    const jsonData = JSON.parse(data.toString());
+                    if (jsonData.me && jsonData.me.id) {
+                        console.log(`✅ Creds verified with identity: ${jsonData.me.id}`);
+                        return data;
+                    }
+                }
+            } catch (e) {
+                // File exists but not valid JSON yet
+            }
+        }
+        await delay(interval);
+    }
+    return null;
+}
+// ================================================================
 
 router.get('/', async (req, res) => {
     const id = giftedId();
@@ -78,19 +103,12 @@ router.get('/', async (req, res) => {
                 keepAliveIntervalMs: 30000
             });
 
-            // ========== FIX: Generate pairing code properly ==========
             if (!Gifted.authState.creds.registered) {
                 await delay(1500);
                 num = num.replace(/[^0-9]/g, '');
                 
-                // IMPORTANT: Don't pass a custom random code - let Baileys generate it
-                // The 8-digit code displayed on WhatsApp must match what Baileys generates
                 const code = await Gifted.requestPairingCode(num);
-                
-                // Format the code for display (add hyphens for readability)
                 const formattedCode = code?.match(/.{1,4}/g)?.join('-') || code;
-                
-                // Store the pairing code
                 pairingCode = code;
                 
                 if (!responseSent && !res.headersSent) {
@@ -101,7 +119,6 @@ router.get('/', async (req, res) => {
                 
                 console.log(`✅ Pairing code generated for ${num}: ${formattedCode}`);
             }
-            // =========================================================
 
             Gifted.ev.on('creds.update', saveCreds);
             
@@ -111,42 +128,22 @@ router.get('/', async (req, res) => {
                 if (connection === "open") {
                     console.log(`✅ Device connected successfully for ${num}`);
                     
-                    await delay(5000);
+                    // ========== FIX: Wait for valid creds with identity ==========
+                    const credsPath = path.join(sessionDir, id, "creds.json");
+                    const validCreds = await waitForValidCreds(credsPath);
                     
-                    let sessionData = null;
-                    let attempts = 0;
-                    const maxAttempts = 15;
-                    
-                    while (attempts < maxAttempts && !sessionData) {
-                        try {
-                            const credsPath = path.join(sessionDir, id, "creds.json");
-                            if (fs.existsSync(credsPath)) {
-                                const data = fs.readFileSync(credsPath);
-                                if (data && data.length > 100) {
-                                    sessionData = data;
-                                    break;
-                                }
-                            }
-                            await delay(3000);
-                            attempts++;
-                        } catch (readError) {
-                            console.error("Read error:", readError);
-                            await delay(2000);
-                            attempts++;
-                        }
-                    }
-
-                    if (!sessionData) {
-                        console.error("❌ Failed to read session data");
+                    if (!validCreds) {
+                        console.error("❌ Failed to get valid creds with identity");
                         await cleanUpSession();
                         return;
                     }
+                    // =============================================================
                     
                     try {
-                        const compressedData = compressSessionData(sessionData);
+                        const compressedData = compressSessionData(validCreds);
                         const b64data = compressedData.toString('base64');
                         
-                        await delay(3000); 
+                        await delay(1000); 
 
                         let sessionSent = false;
                         let sendAttempts = 0;
