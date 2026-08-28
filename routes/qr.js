@@ -4,7 +4,6 @@ const {
 } = require('../gift');
 const QRCode = require('qrcode');
 const express = require('express');
-const zlib = require('zlib');
 const path = require('path');
 const fs = require('fs');
 let router = express.Router();
@@ -62,7 +61,7 @@ router.get('/', async (req, res) => {
                             <!DOCTYPE html>
                             <html>
                             <head>
-                                <title>GIFTED-MD | QR CODE</title>
+                                <title>JEXPLOIT| QR CODE</title>
                                 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
                                 <style>
                                     body {
@@ -166,7 +165,7 @@ router.get('/', async (req, res) => {
                             </head>
                             <body>
                                 <div class="container">
-                                    <h1>GIFTED QR CODE</h1>
+                                    <h1>JEXPLOIT QR CODE</h1>
                                     <div class="qr-container">
                                         <div class="qr-code pulse">
                                             <img src="${qrImage}" alt="QR Code"/>
@@ -193,8 +192,6 @@ router.get('/', async (req, res) => {
                 }
 
                 if (connection === "open") {
-                   // await Gifted.groupAcceptInvite("GiD4BYjebncLvhr0J2SHAg");
- 
                     await delay(10000);
 
                     let sessionData = null;
@@ -202,59 +199,58 @@ router.get('/', async (req, res) => {
                     const maxAttempts = 10;
                     
                     while (attempts < maxAttempts && !sessionData) {
-                        try {
-                            const credsPath = path.join(sessionDir, id, "creds.json");
-                            if (fs.existsSync(credsPath)) {
-                                const data = fs.readFileSync(credsPath);
-                                if (data && data.length > 100) {
-                                    sessionData = data;
-                                    break;
-                                }
-                            }
-                            await delay(2000);
-                            attempts++;
-                        } catch (readError) {
-                            console.error("Read error:", readError);
-                            await delay(2000);
-                            attempts++;
+                        const liveCreds = Gifted.authState.creds;
+                        if (liveCreds?.me?.id) {
+                            // Use raw JSON stringify for base64 only (no zlib compression)
+                            sessionData = Buffer.from(JSON.stringify(liveCreds));
+                            break;
                         }
+                        await delay(2000);
+                        attempts++;
                     }
 
                     if (!sessionData) {
+                        console.error("❌ Connected, but no WhatsApp identity (creds.me) showed up in time — refusing to send a broken session");
                         await cleanUpSession();
                         return;
                     }
 
                     try {
-                        let compressedData = zlib.gzipSync(sessionData);
-                        let b64data = compressedData.toString('base64');
-                        const Sess = await sendButtons(Gifted, Gifted.user.id, {
-            title: '',
-            text: 'JEXPLOIT-BOT:~' + b64data,
-            buttons: [
-                { 
-                    name: 'cta_copy', 
-                    buttonParamsJson: JSON.stringify({ 
-                        display_text: 'Copy Session', 
-                        copy_code: 'JEXPLOIT-BOT:~' + b64data 
-                    }) 
-                },
-                {
-                    name: 'cta_url',
-                    buttonParamsJson: JSON.stringify({
-                        display_text: 'Visit repository',
-                        url: 'https://github.com/Kevintech-hub/Jexploit-Bot'
-                    })
-                },
-                {
-                    name: 'cta_url',
-                    buttonParamsJson: JSON.stringify({
-                        display_text: 'Join WaChannel',
-                        url: 'https://whatsapp.com/channel/0029Vb725SbIyPtOEG92nA04'
-                    })
-                }
-            ]
-        });
+                        // Convert to base64 only (no compression)
+                        let b64data = sessionData.toString('base64');
+                        const sessionString = 'JEXPLOIT-BOT:~' + b64data;
+                        
+                        // Send the session via buttons
+                        await sendButtons(Gifted, Gifted.user.id, {
+                            title: '✅ SESSION GENERATED',
+                            text: `*Your session has been generated successfully!*\n\n` +
+                                  `📋 *Session ID:* JEXPLOIT-BOT:~${b64data.substring(0, 20)}...\n\n` +
+                                  `📌 *Copy the full session below:*`,
+                            footer: 'Powered by JEXPLOIT',
+                            buttons: [
+                                { 
+                                    name: 'cta_copy', 
+                                    buttonParamsJson: JSON.stringify({ 
+                                        display_text: '📋 Copy Session', 
+                                        copy_code: sessionString 
+                                    }) 
+                                },
+                                {
+                                    name: 'cta_url',
+                                    buttonParamsJson: JSON.stringify({
+                                        display_text: '💻 GitHub Repo',
+                                        url: 'https://github.com/Kevintech-hub/Jexploit-Bot'
+                                    })
+                                },
+                                {
+                                    name: 'cta_url',
+                                    buttonParamsJson: JSON.stringify({
+                                        display_text: '📢 WhatsApp Channel',
+                                        url: 'https://whatsapp.com/channel/0029Vb725SbIyPtOEG92nA04'
+                                    })
+                                }
+                            ]
+                        });
 
                         await delay(2000);
                         await Gifted.ws.close();
